@@ -1,90 +1,75 @@
-import * as React from 'react';
-import { Text, View, ScrollView, StyleSheet, Header } from 'react-native';
-import { Agenda } from 'react-native-calendars';
-import Icons from '../icon';
-import Icon from 'react-native-vector-icons/Octicons';
+import React, {Component} from 'react';
+import {Text, View, StyleSheet, TextInput} from 'react-native';
+import {Agenda} from 'react-native-calendars';
 
-export default class AgendaScreen extends React.Component {
+export default class CalendarScreen extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      items: {},
+      currSelectedDate: null,
+      currWeek: {}
+      // prevWeeks:
     };
+
   }
+
   render() {
     return (
-      <Agenda
-        items={this.state.items}
-        loadItemsForMonth={this.loadItems.bind(this)}
-        selected={(Default = Date())}
-        renderItem={this.renderItem.bind(this)}
-        renderEmptyDate={this.renderEmptyDate.bind(this)}
-        rowHasChanged={this.rowHasChanged.bind(this)}
-        // markingType={'period'}
-        // markedDates={{
-        //    '2017-05-08': {textColor: '#666'},
-        //    '2017-05-09': {textColor: '#666'},
-        //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
-        //    '2017-05-21': {startingDay: true, color: 'blue'},
-        //    '2017-05-22': {endingDay: true, color: 'gray'},
-        //    '2017-05-24': {startingDay: true, color: 'gray'},
-        //    '2017-05-25': {color: 'gray'},
-        //    '2017-05-26': {endingDay: true, color: 'gray'}}}
-        // monthFormat={'yyyy'}
-        // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
-        //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
-        onDayPress = {this.sampleFunction.bind(this)}
-      />
+      <React.Fragment>
+        <Agenda
+          items={this.state.items}
+          loadItemsForMonth={this.loadItems.bind(this)}
+          selected={(Default = Date())}
+          renderItem={this.renderItem.bind(this)}
+          renderEmptyDate={this.renderEmptyDate.bind(this)}
+          rowHasChanged={this.rowHasChanged.bind(this)}
+          onDayPress={day => this.setState({currSelectedDate: day})}
+        />
+
+        <TextInput
+          style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+          onChangeText={text => this.updateState(text).bind(this)}
+        />
+      </React.Fragment>
     );
   }
 
-  sampleFunction(object) {
-    // var sum = (object.day)+1;
-    alert((object.day)+1);
+  updateState(text) {
+
   }
 
   loadItems(day) {
-    console.log(day);
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = this.timeToString(time);
-        if (!this.state.items[strTime]) {
-          this.state.items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 5);
-          for (let j = 0; j < numItems; j++) {
-            this.state.items[strTime].push({
-              name: 'Requirement for ' + strTime,
-              height: Math.max(50, Math.floor(Math.random() * 150)),
-            });
-          }
-        }
-      }
-      //console.log(this.state.items);
-      const newItems = {};
-      Object.keys(this.state.items).forEach(key => {
-        newItems[key] = this.state.items[key];
-      });
-      this.setState({
-        items: newItems,
-      });
-    }, 1000);
-    // console.log(`Load Items for ${day.year}-${day.month}`);
+    // const time = day.timestamp + 24 * 60 * 60 * 1000;
+    // const strTime = this.timeToString(time);
+    // if (!this.state.items[strTime]) {
+    //   this.state.items[strTime] = [];
+    //   const numItems = Math.floor(Math.random() * 5);
+    //   for (let j = 0; j < numItems; j++) {
+    //     this.state.items[strTime].push({
+    //       name: 'Requirement for ' + strTime,
+    //       height: Math.max(50, Math.floor(Math.random() * 150))
+    //     });
+    //   }
+    // }
+    // //console.log(this.state.items);
+    // const newItems = {};
+    // Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
+    // this.setState({
+    //   items: newItems
+    // });
+    // // console.log(`Load Items for ${day.year}-${day.month}`);
   }
 
   renderItem(item) {
     return (
-      <View style={[styles.item, { height: item.height }]}>
-        <Text>{item.name}</Text>
-      </View>
+      <View style={[styles.item, {height: item.height}]}><Text>{item.name}</Text></View>
     );
   }
 
   renderEmptyDate() {
     return (
-      <View style={styles.emptyDate}>
-        <Text />
-      </View>
+      <View style={styles.emptyDate}><Text></Text></View>
     );
   }
 
@@ -98,6 +83,20 @@ export default class AgendaScreen extends React.Component {
   }
 }
 
+class TextInputComponent extends CalendarScreen {
+  render() {
+    return(
+      <TextInput
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+        onChangeText={
+          text => this.updateStateText.bind(text),
+          this.setState({currSelectedDate: null})
+        }
+      />
+    );
+  }
+}
+
 const styles = StyleSheet.create({
   item: {
     backgroundColor: 'white',
@@ -105,11 +104,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginRight: 10,
-    marginTop: 17,
+    marginTop: 17
   },
   emptyDate: {
     height: 15,
-    flex: 1,
-    paddingTop: 30,
-  },
+    flex:1,
+    paddingTop: 30
+  }
 });
